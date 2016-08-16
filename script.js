@@ -1,64 +1,100 @@
-function AppViewModel() {
+var defaultLocations = [
 
-    //initializing variables to center map over a default location
-    var map;
-    var current_lat = 38.907032;
-    var current_lng = -77.042672;
-    var current_location = {
-        lat: current_lat,
-        lng: current_lng
-    };
-
-    var locationsArray = ko.observableArray();
-
-    function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: {
-                lat: current_lat,
-                lng: current_lng
-            },
-            zoom: 14
-        });
+    {
+        title: "Smithsonian National Museum of Natural History",
+        location: {
+            lat: 38.908418,
+            lng: -77.022586
+        }
+    }, {
+        title: "Smithsonian National Museum of American History",
+        location: {
+            lat: 38.891081,
+            lng: -77.030244
+        }
+    }, {
+        title: "National Gallery of Art",
+        location: {
+            lat: 38.891266,
+            lng: -77.019945
+        }
+    }, {
+        title: "Newseum",
+        location: {
+            lat: 38.893015,
+            lng: -77.019242
+        }
+    }, {
+        title: "National Portrait Gallery",
+        location: {
+            lat: 38.897706,
+            lng: -77.023245
+        }
     }
+]
 
-    initMap();
+var map;
 
-    //requests nearby museums, aquariums, and art galleries
-
-    var request = {
-        location: current_location,
-        radius: '3000',
-        types: ['museum', 'aquarium', 'art_gallery']
-    };
-
-    service = new google.maps.places.PlacesService(map);
-
-    service.nearbySearch(request, callback);
-
-    function callback(results, status) {
-
-        return results
-    }
-
-    callback();
-    console.log(results);
-
-
-    function createMarker(place) {
-        var placeLoc = place.geometry.location;
-        var infowindow = new google.maps.InfoWindow({
-            content: "sample"
-        });
-        var marker = new google.maps.Marker({
-            map: map,
-            position: place.geometry.location
-        });
-        marker.addListener('click', function() {
-            infowindow.open(map, marker);
-        });
-    }
-
-    console.log(locationsArray());
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+            lat: 38.905206,
+            lng: -77.035511
+        },
+        scrollwheel: false,
+        zoom: 14
+    });
+    console.log("init map");
 }
 
-ko.applyBindings(new AppViewModel());
+
+
+
+
+var AppViewModel = function() {
+    console.log("AppViewModel");
+   var self = this;
+
+   var place = function(data) {
+        this.title = data.title;
+        this.location = data.location;
+
+       
+        this.marker = new google.maps.Marker({
+        	position: this.location,
+        	map: map,
+        	title: this.title
+        });
+
+        //console.log(this.marker.position.lng());
+
+        var infowindow = new google.maps.InfoWindow({
+        	content: "Sample"
+        });
+
+        this.marker.addListener('click', function(){
+        	console.log("listener is working");
+        	console.log(this.title);
+        	infowindow.open(map, this.marker);
+    	});
+       
+    }
+
+   self.locationsObservableArray = ko.observableArray([]);
+
+   defaultLocations.forEach(function(defaultLocation) {
+        self.locationsObservableArray.push(new place(defaultLocation))  
+    });
+
+
+   //console.log(this.locationsObservableArray());
+
+}
+
+
+//Is this still following the idea of async loading?
+function startApplication(){
+	initMap();
+	ko.applyBindings(new AppViewModel);
+}
+
