@@ -1,3 +1,5 @@
+//My array of hardcoded locations
+
 var defaultLocations = [
 
     {
@@ -35,6 +37,8 @@ var defaultLocations = [
 
 var map;
 
+//this function initializes the map
+
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -44,47 +48,61 @@ function initMap() {
         scrollwheel: false,
         zoom: 14
     });
-    console.log("init map");
+    //console.log("init map");
 }
+
+
+
+
+   
 
 
 
 
 
 var AppViewModel = function() {
-    console.log("AppViewModel");
+    //console.log("AppViewModel");
    var self = this;
 
-   var place = function(data) {
+      var place = function(data) {
         this.title = data.title;
         this.location = data.location;
-
        
         this.marker = new google.maps.Marker({
         	position: this.location,
         	map: map,
-        	title: this.title
+        	title: this.title,
+        	animation: google.maps.Animation.DROP
         });
 
-        //console.log(this.marker.position.lng());
+      var infowindow = new google.maps.InfoWindow({
+      	content: this.title
+      });
 
-        var infowindow = new google.maps.InfoWindow({
-        	content: "Sample"
-        });
+      console.log(this);
 
-        this.marker.addListener('click', function(){
-        	console.log("listener is working");
-        	console.log(this.title);
-        	infowindow.open(map, this.marker);
-    	});
-       
+      //why does line84 work? 
+      this.open = google.maps.event.addListener(this.marker, 'click', function(){
+      	infowindow.open(map, this);
+      	console.log(this);
+      });
+	
+
+
+        //console.log(this.marker.position.lng());  
     }
+
+
 
    self.locationsObservableArray = ko.observableArray([]);
 
    defaultLocations.forEach(function(defaultLocation) {
         self.locationsObservableArray.push(new place(defaultLocation))  
     });
+   
+   
+
+
 
 
    //console.log(this.locationsObservableArray());
@@ -93,6 +111,7 @@ var AppViewModel = function() {
 
 
 //Is this still following the idea of async loading?
+//The idea of this function is to load the map and apply bindings after the google api loads
 function startApplication(){
 	initMap();
 	ko.applyBindings(new AppViewModel);
