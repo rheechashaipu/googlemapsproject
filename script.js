@@ -1,5 +1,4 @@
 //My array of hardcoded locations
-
 var defaultLocations = [
 
     {
@@ -51,96 +50,113 @@ function initMap() {
     //console.log("init map");
 }
 
-
 // TASKS:
 // - Add API call
 // - Bounce the marker when clicked
 // - Trigger the infowindow/bounce when the list item is clicked
 
-
 var Place = function(data) {
-  var self = this;
-  self.title = data.title;
-  self.location = data.location;
+    var self = this;
+    self.title = data.title;
+    self.location = data.location;
 
-  self.marker = new google.maps.Marker({
-    position: self.location,
-    map: map,
-    title: self.title,
-    animation: google.maps.Animation.DROP
-  });
+    self.marker = new google.maps.Marker({
+        position: self.location,
+        map: map,
+        title: self.title,
+        animation: google.maps.Animation.DROP
+    });
 
+    var infowindow = new google.maps.InfoWindow({
+        content: self.title
+    });
 
-  var infowindow = new google.maps.InfoWindow({
-    content: self.title
-  });
+    console.log(self);
 
-  console.log(self);
+    self.open = google.maps.event.addListener(self.marker, 'click', function() {
+        infowindow.open(map, self.marker);
 
-  //why does line84 work?
-  self.open = google.maps.event.addListener(self.marker, 'click', function(){
-    infowindow.open(map, self.marker);
-  });
+    });
+}
 
-
-
+function toggleBounce() {
+    if (marker.getAnimation() !== null) {
+        marker.setAnimation(null);
+    } else {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+    }
 }
 
 
 var AppViewModel = function() {
     //console.log("AppViewModel");
-  var self = this;
+    var self = this;
 
-   self.locationsObservableArray = ko.observableArray([]);
+    self.locationsObservableArray = ko.observableArray([]);
 
-   defaultLocations.forEach(function(defaultLocation) {
+    defaultLocations.forEach(function(defaultLocation) {
         self.locationsObservableArray.push(new Place(defaultLocation))
     });
 
-   // this holds the current filter -- bind this to the input
-   self.filter = ko.observable('');
+    // this holds the current filter -- bind this to the input
+    self.filter = ko.observable('');
 
 
-  self.filteredLocations = ko.computed(function() {
-    // if the filter is empty, we should return whole array
-    if (self.filter() === '') {
-      // make markers visible
-      self.locationsObservableArray().forEach(function(location) {
-        location.marker.setVisible(true);
-      });
-      // return the whole array
-      return self.locationsObservableArray();
-    }
+    self.filteredLocations = ko.computed(function() {
+        // if the filter is empty, we should return whole array
+        if (self.filter() === '') {
+            // make markers visible
+            self.locationsObservableArray().forEach(function(location) {
+                location.marker.setVisible(true);
+            });
+            // return the whole array
+            return self.locationsObservableArray();
+        }
 
-    var tempArray = [];
-    // loop through the locations
-    self.locationsObservableArray().forEach(function(location) {
-      // if the location's title matches self.filter...
-      if (location.title.indexOf(self.filter()) > -1) {
-        // make the marker visible
-        location.marker.setVisible(true);
-        // push the location to the temporary array
-        tempArray.push(location);
-      } else {
-        // hide the marker
-        location.marker.setVisible(false);
-      }
+        var tempArray = [];
+        // loop through the locations
+        self.locationsObservableArray().forEach(function(location) {
+            // if the location's title matches self.filter...
+            if (location.title.indexOf(self.filter()) > -1) {
+                // make the marker visible
+                location.marker.setVisible(true);
+                // push the location to the temporary array
+                tempArray.push(location);
+            } else {
+                // hide the marker
+                location.marker.setVisible(false);
+            }
+        });
+        // return the temporary array
+        return tempArray;
     });
-    // return the temporary array
-    return tempArray;
-   });
 
 
 
-   //console.log(this.locationsObservableArray());
+    //make marker bounce when corresponding list item is clicked
+    self.markerBounce = function(location) {
+        console.log(location.marker, "test1");
+        toggleBounce(location.marker);
+    };
+
+
+    //toggleBounce code is called in markerBounce, makes marker bounce
+    function toggleBounce(location) {
+        console.log(location, 'togglebounce');
+        if (location.getAnimation() !== null) {
+            location.setAnimation(null);
+        } else {
+            location.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){location.setAnimation(null);}, 2000);
+        }
+    }
 
 }
 
 
 //Is this still following the idea of async loading?
 //The idea of this function is to load the map and apply bindings after the google api loads
-function startApplication(){
-	initMap();
-	ko.applyBindings(new AppViewModel);
+function startApplication() {
+    initMap();
+    ko.applyBindings(new AppViewModel);
 }
-

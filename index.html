@@ -13,7 +13,7 @@
 			<input type="text" placeholder="Filter" data-bind="textInput: filter" />
 			<p>Listings</p>
 			<ul data-bind="foreach: filteredLocations">
-				<li data-bind="text: title"></li>
+				<li data-bind="text: title, click: $parent.markerBounce"></li>
 			</ul>
 		</div>
 	</div>
