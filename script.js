@@ -55,6 +55,10 @@ function initMap() {
 // - Bounce the marker when clicked
 // - Trigger the infowindow/bounce when the list item is clicked
 
+
+
+//make api call when info window is opened?
+
 var Place = function(data) {
     var self = this;
     self.title = data.title;
@@ -102,6 +106,8 @@ var AppViewModel = function() {
     self.filter = ko.observable('');
 
 
+    //the filteredLocations decides whether or not the filter is being utilized and...
+    //...outputs the appropriate array
     self.filteredLocations = ko.computed(function() {
         // if the filter is empty, we should return whole array
         if (self.filter() === '') {
@@ -139,6 +145,7 @@ var AppViewModel = function() {
         toggleBounce(location.marker);
     };
 
+//maybe add ajax request here, use location as a parameter so that the ajax request applies to every location. access info window proeprty through location.
 
     //toggleBounce code is called in markerBounce, makes marker bounce
     function toggleBounce(location) {
@@ -147,6 +154,7 @@ var AppViewModel = function() {
             location.setAnimation(null);
         } else {
             location.setAnimation(google.maps.Animation.BOUNCE);
+            //
             setTimeout(function(){location.setAnimation(null);}, 2000);
         }
     }
