@@ -31,7 +31,22 @@ var defaultLocations = [
             lat: 38.897706,
             lng: -77.023245
         }
-    }
+    },
+       {
+        title: "Smithsonian National Air and Space Museum",
+        location: {
+            lat:38.888386,
+            lng: -77.019868
+            }
+       },
+      {
+       title: "National Mall",
+       location: {
+            lat: 38.8896, 
+            lng: -77.0230
+       }
+   }
+
 ]
 
 var map;
@@ -71,13 +86,48 @@ var Place = function(data) {
         animation: google.maps.Animation.DROP
     });
 
-    var infowindow = new google.maps.InfoWindow({
+    /**var infowindow = new google.maps.InfoWindow({
         content: self.title
-    });
+    });**/
 
     console.log(self);
 
-    self.open = google.maps.event.addListener(self.marker, 'click', function() {
+    google.maps.event.addListener(self.marker, 'click', function() {
+
+        var infowindow = new google.maps.InfoWindow();
+
+        var content;
+
+
+
+
+
+        //infowindow.open(map, self.marker);
+
+        placeTitle = self.title;
+        //console.log(placeTitle);
+
+
+        var wikiURL = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search='+placeTitle+'&namespace=0&limit=1&suggest=1';
+
+        //console.log(wikiURL);
+
+        $.ajax({
+            url: wikiURL,
+            dataType: "jsonp",
+            success: function(response){
+                console.log(response);
+
+                var contentString = response[2];
+                var wikiLink = response[3];
+
+                console.log(contentString);
+
+                infowindow.setContent(placeTitle+'<br>'+'<p>'+contentString+'</p>'+'<br>'+wikiLink);
+            }
+
+        });
+        
         infowindow.open(map, self.marker);
 
     });
@@ -145,7 +195,6 @@ var AppViewModel = function() {
         toggleBounce(location.marker);
     };
 
-//maybe add ajax request here, use location as a parameter so that the ajax request applies to every location. access info window proeprty through location.
 
     //toggleBounce code is called in markerBounce, makes marker bounce
     function toggleBounce(location) {
