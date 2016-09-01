@@ -8,11 +8,10 @@
 	<div id="wrapper">
 		<div id="map">
 		</div>
-		<div class="menu">
-			<h1>Museums in Washington DC</h1>
-			<input type="text" placeholder="Filter" data-bind="textInput: filter" />
-			<p>Listings</p>
-			<ul data-bind="foreach: filteredLocations">
+			<div class="menu">
+			<h4>Museums and Landmarks in DC</h4>
+			<input id="filterSearchBar" type="text" placeholder="Filter" data-bind="textInput: filter" />
+			<ul class="nav" data-bind="foreach: filteredLocations">
 				<li data-bind="text: title, click: $parent.markerBounce"></li>
 			</ul>
 		</div>

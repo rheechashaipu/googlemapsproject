@@ -38,14 +38,29 @@ var defaultLocations = [
             lat:38.888386,
             lng: -77.019868
             }
-       },
+    },
       {
        title: "National Mall",
        location: {
             lat: 38.8896, 
             lng: -77.0230
        }
-   }
+   },
+    {
+     title: "Lincoln Memorial",
+     location: {
+        lat: 38.889486,
+        lng: -77.050165
+     }
+    },
+    {
+     title: "Washington Monument",
+     location: {
+        lat: 38.8895,
+        lng: -77.0353
+     }
+    }
+
 
 ]
 
@@ -65,14 +80,6 @@ function initMap() {
     //console.log("init map");
 }
 
-// TASKS:
-// - Add API call
-// - Bounce the marker when clicked
-// - Trigger the infowindow/bounce when the list item is clicked
-
-
-
-//make api call when info window is opened?
 
 var Place = function(data) {
     var self = this;
@@ -86,21 +93,32 @@ var Place = function(data) {
         animation: google.maps.Animation.DROP
     });
 
-    /**var infowindow = new google.maps.InfoWindow({
-        content: self.title
-    });**/
 
-    console.log(self);
+    //togglebounce here will bounce the marker a couple times when the marker is clicked.
+    //this could probably somehow be reconciled with the other togglebounce function to avoid repetition
 
+        function toggleBounce() {
+        //console.log(location, 'togglebounce');
+        if (self.marker.getAnimation() !== null) {
+            self.marker.setAnimation(null);
+        } else {
+            self.marker.setAnimation(google.maps.Animation.BOUNCE);
+            //
+            setTimeout(function(){self.marker.setAnimation(null);}, 2000);
+        }
+    }
+
+    self.marker.addListener('click', toggleBounce);
+    
+
+
+
+    //addListener opens infowindow when marker is clicked
     google.maps.event.addListener(self.marker, 'click', function() {
 
         var infowindow = new google.maps.InfoWindow();
 
         var content;
-
-
-
-
 
         //infowindow.open(map, self.marker);
 
@@ -111,34 +129,31 @@ var Place = function(data) {
         var wikiURL = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search='+placeTitle+'&namespace=0&limit=1&suggest=1';
 
         //console.log(wikiURL);
+        //ajax call to get wikipedia content when infowindow is opened
 
         $.ajax({
             url: wikiURL,
             dataType: "jsonp",
             success: function(response){
-                console.log(response);
+                //console.log(response);
 
                 var contentString = response[2];
                 var wikiLink = response[3];
 
-                console.log(contentString);
+                //console.log(contentString);
 
-                infowindow.setContent(placeTitle+'<br>'+'<p>'+contentString+'</p>'+'<br>'+wikiLink);
+                infowindow.setContent(placeTitle+'<br>'+'<p>'+contentString+'</p>'+'<br>'+
+                    wikiLink);
+            },
+            error: function(){
+                infowindow.setContent('Error! Wikipedia content did not load.');
             }
 
         });
-        
+
         infowindow.open(map, self.marker);
 
     });
-}
-
-function toggleBounce() {
-    if (marker.getAnimation() !== null) {
-        marker.setAnimation(null);
-    } else {
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-    }
 }
 
 
@@ -191,14 +206,12 @@ var AppViewModel = function() {
 
     //make marker bounce when corresponding list item is clicked
     self.markerBounce = function(location) {
-        console.log(location.marker, "test1");
         toggleBounce(location.marker);
     };
 
-
-    //toggleBounce code is called in markerBounce, makes marker bounce
+    //toggleBounce code is called in markerBounce, makes marker bounce a couple times
     function toggleBounce(location) {
-        console.log(location, 'togglebounce');
+        //console.log(location, 'togglebounce');
         if (location.getAnimation() !== null) {
             location.setAnimation(null);
         } else {
