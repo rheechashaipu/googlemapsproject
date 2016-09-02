@@ -60,14 +60,18 @@ var defaultLocations = [
         lng: -77.0353
      }
     }
-
-
-]
+];
 
 var map;
 
-//this function initializes the map
+//This function alerts the user when the Google API fails to load.
+function googleError(){
+        alert("Google API failed to load.");
+        //console.log("error");
+}
 
+
+//initMap loads the google map and applies knockout bindings
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -77,8 +81,10 @@ function initMap() {
         scrollwheel: false,
         zoom: 14
     });
-    //console.log("init map");
+    ko.applyBindings(new AppViewModel());
 }
+
+
 
 
 var Place = function(data) {
@@ -118,8 +124,6 @@ var Place = function(data) {
 
         var infowindow = new google.maps.InfoWindow();
 
-        var content;
-
         //infowindow.open(map, self.marker);
 
         placeTitle = self.title;
@@ -154,7 +158,7 @@ var Place = function(data) {
         infowindow.open(map, self.marker);
 
     });
-}
+};
 
 
 var AppViewModel = function() {
@@ -164,7 +168,7 @@ var AppViewModel = function() {
     self.locationsObservableArray = ko.observableArray([]);
 
     defaultLocations.forEach(function(defaultLocation) {
-        self.locationsObservableArray.push(new Place(defaultLocation))
+        self.locationsObservableArray.push(new Place(defaultLocation));
     });
 
     // this holds the current filter -- bind this to the input
@@ -221,12 +225,4 @@ var AppViewModel = function() {
         }
     }
 
-}
-
-
-//Is this still following the idea of async loading?
-//The idea of this function is to load the map and apply bindings after the google api loads
-function startApplication() {
-    initMap();
-    ko.applyBindings(new AppViewModel);
-}
+};
