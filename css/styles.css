@@ -38,6 +38,6 @@ input {
 	border: 3px solid #87CEFA;
 	max-width: 25vw;
 	max-height: 80%;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
