@@ -99,12 +99,13 @@ var Place = function(data) {
         animation: google.maps.Animation.DROP
     });
 
+    self.infowindow = new google.maps.InfoWindow();
 
-    //togglebounce here will bounce the marker a couple times when the marker is clicked.
-    //this could probably somehow be reconciled with the other togglebounce function to avoid repetition
 
-        function toggleBounce() {
-        //console.log(location, 'togglebounce');
+
+    //togglebounce will bounce the marker a couple times when the marker is clicked.
+
+    self.toggleBounce = function toggleBounce() {
         if (self.marker.getAnimation() !== null) {
             self.marker.setAnimation(null);
         } else {
@@ -112,53 +113,44 @@ var Place = function(data) {
             //
             setTimeout(function(){self.marker.setAnimation(null);}, 2000);
         }
-    }
-
-    self.marker.addListener('click', toggleBounce);
+    };
     
 
+    //This is the wikiURL, it usees the opensearch action to look for content related to a given place's title
+    var wikiURL = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search='+self.title+'&namespace=0&limit=1&suggest=1';
 
 
-    //addListener opens infowindow when marker is clicked
-    google.maps.event.addListener(self.marker, 'click', function() {
+    //ajax call to get wikipedia content and set content in the infowindows
+    $.ajax({
+        url: wikiURL,
+        dataType: "jsonp",
+        success: function(response){
+            //console.log(response);
 
-        var infowindow = new google.maps.InfoWindow();
+            var contentString = response[2];
+            var wikiLink = response[3];
 
-        //infowindow.open(map, self.marker);
+            //console.log(contentString);
 
-        placeTitle = self.title;
-        //console.log(placeTitle);
-
-
-        var wikiURL = 'https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search='+placeTitle+'&namespace=0&limit=1&suggest=1';
-
-        //console.log(wikiURL);
-        //ajax call to get wikipedia content when infowindow is opened
-
-        $.ajax({
-            url: wikiURL,
-            dataType: "jsonp",
-            success: function(response){
-                //console.log(response);
-
-                var contentString = response[2];
-                var wikiLink = response[3];
-
-                //console.log(contentString);
-
-                infowindow.setContent(placeTitle+'<br>'+'<p>'+contentString+'</p>'+'<br>'+
-                    wikiLink);
-            },
-            error: function(){
-                infowindow.setContent('Error! Wikipedia content did not load.');
-            }
-
-        });
-
-        infowindow.open(map, self.marker);
+            self.infowindow.setContent(self.title+'<br>'+'<p>'+contentString+'</p>'+'<br>'+
+                wikiLink);
+        },
+        error: function(){
+            self.infowindow.setContent('Error! Wikipedia content did not load.');
+        }
 
     });
+
+    //These event listeners, upon clicking a marker, will animate the marker and open the infowindow
+    google.maps.event.addListener(self.marker, 'click', function(){
+     self.infowindow.open(map, self.marker);
+    });
+    self.marker.addListener('click', self.toggleBounce);
 };
+
+
+
+
 
 
 var AppViewModel = function() {
@@ -192,10 +184,11 @@ var AppViewModel = function() {
         // loop through the locations
         self.locationsObservableArray().forEach(function(location) {
             // if the location's title matches self.filter...
-            if (location.title.indexOf(self.filter()) > -1) {
-                // make the marker visible
+            // (note: toLowerCase() is used to make searches case insensitive)
+            if (location.title.toLowerCase().indexOf(self.filter().toLowerCase()) > -1) {
+                // ...make the marker visible...
                 location.marker.setVisible(true);
-                // push the location to the temporary array
+                // ...push the location to the temporary array
                 tempArray.push(location);
             } else {
                 // hide the marker
@@ -207,22 +200,9 @@ var AppViewModel = function() {
     });
 
 
-
     //make marker bounce when corresponding list item is clicked
     self.markerBounce = function(location) {
-        toggleBounce(location.marker);
+        location.toggleBounce();
+        location.infowindow.open(map, location.marker);
     };
-
-    //toggleBounce code is called in markerBounce, makes marker bounce a couple times
-    function toggleBounce(location) {
-        //console.log(location, 'togglebounce');
-        if (location.getAnimation() !== null) {
-            location.setAnimation(null);
-        } else {
-            location.setAnimation(google.maps.Animation.BOUNCE);
-            //
-            setTimeout(function(){location.setAnimation(null);}, 2000);
-        }
-    }
-
 };
