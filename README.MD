@@ -1,6 +1,7 @@
 This is an application showcasing a few museums and landmarks in Washington DC.
 
 To use this app, save the repository and open the index.html file in a browser of your choice (preferably Chrome).
+Live version of the project here: https://rheechashaipu.github.io/googlemapsproject/
 
 In the app, on the left, there is a menu with a search bar in which the user may search for locations. The list will update automatically and display locations matching the content in the search bar.
 
