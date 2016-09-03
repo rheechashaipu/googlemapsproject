@@ -5,21 +5,30 @@
 		<link href="css/styles.css" rel="stylesheet">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
+		<!-- Bootstap CSS cdn -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 	</head>
 	<body>
 	<div id="wrapper">
 		<div id="map">
 		</div>
 			<div class="menu">
+			<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#demo">Simple collapsible</button>
+			<div id="demo" class="collapse">
 			<h4>Museums and Landmarks in DC</h4>
 			<input id="filterSearchBar" type="text" placeholder="Filter" data-bind="textInput: filter" />
 			<ul class="nav" data-bind="foreach: filteredLocations">
 				<li data-bind="text: title, click: $parent.markerBounce"></li>
 			</ul>
+			</div>
 		</div>
 	</div>
    <script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.3.0.js"></script>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+	<!-- Bootstrap js cdn -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous" async></script>
+
    <script src="js/script.js"></script>
    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4DeIqVB0BaNBpZu-3ePyPCJQMLffv5Z8&libraries=places&callback=initMap" onerror="googleError()" async defer></script>
    	</body>
