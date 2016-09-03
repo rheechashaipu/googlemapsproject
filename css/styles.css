@@ -32,5 +32,8 @@ li {
 	top: 50px;
 	left: 0px;
 	border: 3px solid #87CEFA;
+	max-width: 20vw;
+	max-height: 80%;
+	overflow-y: scroll;
 }
 
